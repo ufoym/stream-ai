@@ -4,6 +4,8 @@
 #include "platform/macos/backend.hpp"
 #elif defined(__linux__)
 #include "platform/linux/backend.hpp"
+#elif defined(_WIN32)
+#include "platform/windows/backend.hpp"
 #endif
 
 namespace streamcam {
@@ -13,6 +15,8 @@ std::vector<streamcam_device_info> ListDevices() {
   return ListDevicesMacos();
 #elif defined(__linux__)
   return ListDevicesLinux();
+#elif defined(_WIN32)
+  return ListDevicesWindows();
 #else
   return {};
 #endif
@@ -31,6 +35,9 @@ std::unique_ptr<Backend> CreateBackend(const char* device_id,
 #elif defined(__linux__)
   *out_status = STREAMCAM_STATUS_OK;
   return std::make_unique<LinuxBackend>(device_id, config);
+#elif defined(_WIN32)
+  *out_status = STREAMCAM_STATUS_OK;
+  return std::make_unique<WindowsBackend>(device_id, config);
 #else
   (void)device_id;
   (void)config;

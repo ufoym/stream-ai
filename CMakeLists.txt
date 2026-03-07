@@ -38,8 +38,20 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_sources(streamcam PRIVATE
     src/platform/linux/backend.cpp
   )
+elseif(WIN32)
+  target_sources(streamcam PRIVATE
+    src/platform/windows/backend.cpp
+  )
+  target_link_libraries(streamcam
+    PRIVATE
+      mf
+      mfplat
+      mfreadwrite
+      mfuuid
+      ole32
+  )
 else()
-  message(WARNING "Windows backend is not implemented yet in this version.")
+  message(WARNING "streamcam does not have a native backend for this platform.")
 endif()
 
 add_executable(streamcam_list_devices examples/list_devices.cpp)

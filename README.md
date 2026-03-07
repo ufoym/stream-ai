@@ -10,7 +10,7 @@ This initial version focuses on:
 - A fast "latest frame" capture model
 - A working macOS backend built on AVFoundation
 - A working Linux backend built on V4L2
-- A codebase layout that can be extended to a Windows native backend
+- A working Windows backend built on Media Foundation
 
 ## Design notes
 
@@ -70,11 +70,10 @@ streamcam_close(reader);
 
 - macOS: implemented with `AVCaptureSession + AVCaptureVideoDataOutput`
 - Linux: implemented with `V4L2 + mmap + polling capture thread`
-- Windows: public API and build layout are ready, native backend is not implemented yet
+- Windows: implemented with `Media Foundation + IMFSourceReader` asynchronous capture
 
 ## Next steps
 
-- Add Windows Media Foundation backend
 - Support more native pixel formats with zero conversion on hot paths
 - Expose camera controls such as exposure, focus, and white balance
 - Add CI coverage on native Linux runners with real V4L2 smoke tests
