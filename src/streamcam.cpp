@@ -46,7 +46,7 @@ streamcam_config streamcam_default_config(void) {
   config.width = 1280;
   config.height = 720;
   config.fps = 60;
-  config.preferred_format = STREAMCAM_PIXEL_FORMAT_BGRA32;
+  config.preferred_format = STREAMCAM_PIXEL_FORMAT_NATIVE;
   return config;
 }
 

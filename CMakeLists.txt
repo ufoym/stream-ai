@@ -34,8 +34,12 @@ if(APPLE)
       ${COREVIDEO_FRAMEWORK}
       ${FOUNDATION_FRAMEWORK}
   )
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  target_sources(streamcam PRIVATE
+    src/platform/linux/backend.cpp
+  )
 else()
-  message(WARNING "Only the macOS backend is implemented in this initial version.")
+  message(WARNING "Windows backend is not implemented yet in this version.")
 endif()
 
 add_executable(streamcam_list_devices examples/list_devices.cpp)

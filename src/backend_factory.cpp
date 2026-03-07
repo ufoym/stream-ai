@@ -2,6 +2,8 @@
 
 #if defined(__APPLE__)
 #include "platform/macos/backend.hpp"
+#elif defined(__linux__)
+#include "platform/linux/backend.hpp"
 #endif
 
 namespace streamcam {
@@ -9,6 +11,8 @@ namespace streamcam {
 std::vector<streamcam_device_info> ListDevices() {
 #if defined(__APPLE__)
   return ListDevicesMacos();
+#elif defined(__linux__)
+  return ListDevicesLinux();
 #else
   return {};
 #endif
@@ -24,6 +28,9 @@ std::unique_ptr<Backend> CreateBackend(const char* device_id,
 #if defined(__APPLE__)
   *out_status = STREAMCAM_STATUS_OK;
   return std::make_unique<MacosBackend>(device_id, config);
+#elif defined(__linux__)
+  *out_status = STREAMCAM_STATUS_OK;
+  return std::make_unique<LinuxBackend>(device_id, config);
 #else
   (void)device_id;
   (void)config;
