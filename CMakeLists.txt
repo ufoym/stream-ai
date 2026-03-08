@@ -6,52 +6,103 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_library(streamcam STATIC
+option(STREAMCAM_BUILD_SHARED "Build a shared library for FFI examples" ON)
+option(STREAMCAM_BUILD_PYTHON_MODULE "Build the CPython extension module" ON)
+
+set(STREAMCAM_SOURCES
   src/backend_factory.cpp
   src/streamcam.cpp
 )
 
-target_include_directories(streamcam
-  PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-  PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
+set(STREAMCAM_PLATFORM_LIBS "")
 
 if(APPLE)
   enable_language(OBJCXX)
-  target_sources(streamcam PRIVATE
+  list(APPEND STREAMCAM_SOURCES
     src/platform/macos/backend.mm
   )
   find_library(AVFOUNDATION_FRAMEWORK AVFoundation REQUIRED)
   find_library(COREMEDIA_FRAMEWORK CoreMedia REQUIRED)
   find_library(COREVIDEO_FRAMEWORK CoreVideo REQUIRED)
   find_library(FOUNDATION_FRAMEWORK Foundation REQUIRED)
-  target_link_libraries(streamcam
-    PRIVATE
-      ${AVFOUNDATION_FRAMEWORK}
-      ${COREMEDIA_FRAMEWORK}
-      ${COREVIDEO_FRAMEWORK}
-      ${FOUNDATION_FRAMEWORK}
+  list(APPEND STREAMCAM_PLATFORM_LIBS
+    ${AVFOUNDATION_FRAMEWORK}
+    ${COREMEDIA_FRAMEWORK}
+    ${COREVIDEO_FRAMEWORK}
+    ${FOUNDATION_FRAMEWORK}
   )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  target_sources(streamcam PRIVATE
+  list(APPEND STREAMCAM_SOURCES
     src/platform/linux/backend.cpp
   )
 elseif(WIN32)
-  target_sources(streamcam PRIVATE
+  list(APPEND STREAMCAM_SOURCES
     src/platform/windows/backend.cpp
   )
-  target_link_libraries(streamcam
-    PRIVATE
-      mf
-      mfplat
-      mfreadwrite
-      mfuuid
-      ole32
+  list(APPEND STREAMCAM_PLATFORM_LIBS
+    mf
+    mfplat
+    mfreadwrite
+    mfuuid
+    ole32
   )
 else()
   message(WARNING "streamcam does not have a native backend for this platform.")
+endif()
+
+function(streamcam_configure_target target_name)
+  target_include_directories(${target_name}
+    PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/src
+  )
+
+  if(STREAMCAM_PLATFORM_LIBS)
+    target_link_libraries(${target_name}
+      PRIVATE
+        ${STREAMCAM_PLATFORM_LIBS}
+    )
+  endif()
+endfunction()
+
+add_library(streamcam STATIC ${STREAMCAM_SOURCES})
+streamcam_configure_target(streamcam)
+set_target_properties(streamcam PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+if(STREAMCAM_BUILD_SHARED)
+  add_library(streamcam_shared SHARED ${STREAMCAM_SOURCES})
+  streamcam_configure_target(streamcam_shared)
+  set_target_properties(streamcam_shared PROPERTIES OUTPUT_NAME streamcam)
+
+  if(WIN32)
+    set_target_properties(streamcam_shared PROPERTIES
+      WINDOWS_EXPORT_ALL_SYMBOLS ON
+      ARCHIVE_OUTPUT_NAME streamcam_shared
+    )
+  endif()
+endif()
+
+if(STREAMCAM_BUILD_PYTHON_MODULE)
+  find_package(Python3 COMPONENTS Development.Module REQUIRED)
+
+  Python3_add_library(streamcam_python MODULE WITH_SOABI
+    src/python_module.cpp
+  )
+  target_link_libraries(streamcam_python
+    PRIVATE
+      Python3::Module
+      streamcam
+  )
+  target_include_directories(streamcam_python
+    PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      ${CMAKE_CURRENT_SOURCE_DIR}/src
+  )
+  set_target_properties(streamcam_python PROPERTIES
+    OUTPUT_NAME streamcam
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/examples
+  )
 endif()
 
 add_executable(streamcam_list_devices examples/list_devices.cpp)

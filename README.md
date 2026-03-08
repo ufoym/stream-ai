@@ -36,6 +36,12 @@ cmake -S . -B build
 cmake --build build
 ```
 
+The default build now produces:
+
+- `libstreamcam.a` (or platform equivalent static library) for native C/C++ linking
+- `libstreamcam.{dylib,so}` / `streamcam.dll` for FFI use such as Python `ctypes`
+- `examples/streamcam.*` as a CPython extension module for the Python examples
+
 ## Quick start
 
 ```cpp
@@ -63,8 +69,31 @@ streamcam_close(reader);
 
 ## Examples
 
-- `streamcam_list_devices`
-- `streamcam_capture_benchmark`
+- C++:
+  - `examples/list_devices.cpp`
+  - `examples/capture_benchmark.cpp`
+- Python:
+  - `import streamcam`
+  - `examples/list_devices.py`
+  - `examples/capture_benchmark.py`
+
+Run the C++ examples after building:
+
+```bash
+./build/streamcam_list_devices
+./build/streamcam_capture_benchmark
+```
+
+Run the Python examples after building:
+
+```bash
+python3 examples/list_devices.py
+python3 examples/capture_benchmark.py
+```
+
+The build places the compiled `streamcam` extension module next to the Python
+examples so they can `import streamcam` directly without additional packaging or
+`PYTHONPATH` setup.
 
 ## Current status
 
