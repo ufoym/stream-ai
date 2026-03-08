@@ -84,7 +84,11 @@ if(STREAMCAM_BUILD_SHARED)
 endif()
 
 if(STREAMCAM_BUILD_PYTHON_MODULE)
-  find_package(Python3 COMPONENTS Development.Module REQUIRED)
+  # Prefer a concrete interpreter location first so non-system Python installs
+  # such as Homebrew/Linuxbrew are discovered more reliably.
+  set(Python3_FIND_STRATEGY LOCATION)
+  set(Python3_FIND_IMPLEMENTATIONS CPython)
+  find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
 
   Python3_add_library(streamcam_python MODULE WITH_SOABI
     src/python_module.cpp
