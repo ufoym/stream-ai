@@ -105,8 +105,5 @@ if(STREAMCAM_BUILD_PYTHON_MODULE)
   )
 endif()
 
-add_executable(streamcam_list_devices examples/list_devices.cpp)
-target_link_libraries(streamcam_list_devices PRIVATE streamcam)
-
-add_executable(streamcam_capture_benchmark examples/capture_benchmark.cpp)
-target_link_libraries(streamcam_capture_benchmark PRIVATE streamcam)
+add_executable(streamcam_quickstart examples/quickstart.cpp)
+target_link_libraries(streamcam_quickstart PRIVATE streamcam)

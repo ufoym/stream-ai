@@ -70,25 +70,21 @@ streamcam_close(reader);
 ## Examples
 
 - C++:
-  - `examples/list_devices.cpp`
-  - `examples/capture_benchmark.cpp`
+  - `examples/quickstart.cpp`
 - Python:
   - `import streamcam`
-  - `examples/list_devices.py`
-  - `examples/capture_benchmark.py`
+  - `examples/quickstart.py`
 
-Run the C++ examples after building:
+Run the C++ example after building:
 
 ```bash
-./build/streamcam_list_devices
-./build/streamcam_capture_benchmark
+./build/streamcam_quickstart
 ```
 
-Run the Python examples after building:
+Run the Python example after building:
 
 ```bash
-python3 examples/list_devices.py
-python3 examples/capture_benchmark.py
+python3 examples/quickstart.py
 ```
 
 The build places the compiled `streamcam` extension module next to the Python
